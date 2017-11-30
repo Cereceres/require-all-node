@@ -1,19 +1,40 @@
-'use strict'
-const fs = require("fs")
-const path = require('path')
-/**
- * 
- *
- */
- module.exports = function  (_path) {
-    let arrayOfModules = []
-    console.log('__dirname',process.cwd(), __filename, process.env.PWD)
-    let pathToDirectory = path.normalize(__dirname.split('/')
-    .slice(0,-1).join('/') + '/' + _path)
-    console.log('pathToDirectory',pathToDirectory)
-    fs.readdirSync(pathToDirectory).forEach(file => {
-     console.log('file', file)
-    arrayOfModules.push(require(_path + '/' + file))
+const fs = require('fs');
+const path = require('path');
+
+
+const requireFile = (pathToFile) => require(pathToFile);
+
+exports.requireAll = function(_path, cb) {
+    const parentDir = path.dirname(module.parent.filename);
+    const pathToDirectory = path.resolve(parentDir, _path);
+    if (typeof cb === 'function') return fs.readdir(pathToDirectory, (err, files) => {
+        if (err) return cb(err);
+        const arrayOfModules = files.map((file) => {
+            const pathToFile = path.resolve(pathToDirectory, file);
+            return requireFile(pathToFile);
+        });
+        cb(null, arrayOfModules);
     });
-    return arrayOfModules
- }
+
+    return new Promise((resolve, reject) => {
+        fs.readdir(pathToDirectory, (err, files) => {
+            if (err) return reject(err);
+            const arrayOfModules = files.map((file) => {
+                const pathToFile = path.resolve(pathToDirectory, file);
+                return requireFile(pathToFile);
+            });
+            resolve(arrayOfModules);
+        });
+    });
+};
+
+exports.requireAllSync = function(_path, cb) {
+    const parentDir = path.dirname(module.parent.filename);
+    const pathToDirectory = path.resolve(parentDir, _path);
+    const files = fs.readdirSync(pathToDirectory);
+
+    return files.map((file) => {
+        const pathToFile = path.resolve(pathToDirectory, file);
+        return requireFile(pathToFile);
+    });
+};
