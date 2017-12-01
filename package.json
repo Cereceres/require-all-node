@@ -1,6 +1,6 @@
 {
   "name": "require-all-node",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "require all file in directory",
   "main": "index.js",
   "scripts": {
