@@ -20,4 +20,20 @@ describe('Test to requireall', () => {
         const allFiles = requireAllSync('../test/testing');
         assert.deepEqual(allFiles, [ 1, 'test2' ]);
     });
+
+    it('should export a sync version', () => {
+        const allFiles = requireAllSync('../test/testing');
+        assert.deepEqual(allFiles, [ 1, 'test2' ]);
+    });
+
+    it('should export a sync version', () => {
+        const allFiles = requireAllSync('../test/testing', '.html');
+        assert.deepEqual(allFiles, [ {} ]);
+    });
+
+    it('should export a funcition what get all files', (done) => requireAll('../test/testing', '.html', (err, allFiles) => {
+        assert(!err);
+        assert.deepEqual(allFiles, [ {} ]);
+        done();
+    }));
 });
